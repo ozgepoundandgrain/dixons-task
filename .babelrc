@@ -1,0 +1,11 @@
+{
+  "presets": [
+    "es2015",
+    "stage-1",
+    "react"
+  ],
+  "plugins": [
+    "babel-plugin-stylus-compiler",
+    "transform-decorators-legacy"
+  ]
+}
