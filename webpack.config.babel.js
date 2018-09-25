@@ -156,7 +156,7 @@ module.exports = function(env) {
           }
         }
       },
-      publicPath: '/gbuk/',
+      publicPath: '/',
       stats: 'minimal'
     },
     devtool: env.prod ? 'none' : 'eval',
