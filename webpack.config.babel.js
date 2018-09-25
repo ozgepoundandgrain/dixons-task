@@ -1,16 +1,45 @@
-/* eslint-disable func-names */
-const path = require('path');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const modifyResponse = require('http-proxy-response-rewrite');
-
-const port = 8080;
+/* eslint-disable func-names, import/no-dynamic-require */
+import CleanWebpackPlugin from 'clean-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import modifyResponse from 'http-proxy-response-rewrite';
+import path from 'path';
+import url from 'url';
+import emoji from 'emojis';
+import chalk from 'chalk';
+import {
+  bundleScript,
+  devConfig
+} from './dev';
 
 module.exports = function(env) {
-  const experimentName = env.experiment ? env.experiment : '';
+
+  const experimentName = env.experiment !== true ? env.experiment : 'example';
   const filename = experimentName ? `${experimentName}.bundle.js` : 'bundle.js';
 
-  const bundleScript = `<script type="text/javascript" src="${filename}"></script>`;
+  let projectConfig;
+
+  try {
+    projectConfig = require(`./src/${experimentName}/config`).config;
+  } catch (e) {
+    if (e instanceof Error && e.code === 'MODULE_NOT_FOUND') {
+      console.log(chalk.cyan(emoji.unicode('No project config! :eyes:')));
+    } else { throw e; }
+  }
+
+  const config = devConfig(projectConfig);
+
+  console.log(chalk.cyan(emoji.unicode(`Dev config :dancer:: \n${JSON.stringify(config)}`)));
+
+  const {
+    url: experimentURL,
+    port
+  } = config;
+
+  const {
+    host,
+    path: parsedPath,
+    protocol
+  } = url.parse(experimentURL);
 
   return {
     entry: [
@@ -21,19 +50,6 @@ module.exports = function(env) {
     resolve: {
       extensions: ['.js', '.styl']
     },
-    // optimization: {
-    //   splitChunks: {
-    //     cacheGroups: {
-    //       commons: {
-    //         name: 'commons',
-    //         chunks: 'initial',
-    //         minChunks: 2,
-    //         minSize: 0
-    //       }
-    //     }
-    //   },
-    //   occurrenceOrder: true // To keep filename consistent between different modes (for example building only)
-    // },
     output: {
       path: path.resolve(__dirname, 'dist'),
       // filename: `${experimentName ? experimentName : '[name]'}bundle.[hash].js`,
@@ -87,40 +103,41 @@ module.exports = function(env) {
         }
       ]
     },
-    performance: {
-      hints: 'warning', // enum
-      maxAssetSize: 400000, // int (in bytes),
-      maxEntrypointSize: 400000, // int (in bytes)
-      assetFilter: function(assetFilename) {
-        // Function predicate that provides asset filenames
-        return assetFilename.endsWith('.style') || assetFilename.endsWith('.js');
-      }
-    },
-    mode: env.prod ? 'production' : 'development',
-    devtool: env.prod ? 'none' : 'eval',
-    watch: true,
+    // NOTE: Use with local template
+    // performance: {
+    //   hints: 'warning', // enum
+    //   maxAssetSize: 400000, // int (in bytes),
+    //   maxEntrypointSize: 400000, // int (in bytes)
+    //   assetFilter: function(assetFilename) {
+    //     // Function predicate that provides asset filenames
+    //     console.log(assetFilename);
+    //     return assetFilename.endsWith('.styl') || assetFilename.endsWith('.js');
+    //   }
+    // },
     devServer: {
-      // hot: true,
-      // quiet: true
       // host: '...',
+      // hot: true,
+      // noInfo: true,
+      // quiet: true,
+      compress: true, // disable gzip
+      contentBase: path.join(__dirname, 'dist'),
+      https: true,
+      index: '',
+      open: 'Google Chrome',
+      openPage: parsedPath,
       overlay: {
         warnings: true,
         errors: true
       },
       port: port,
-      compress: false, // disable gzip
-      contentBase: path.join(__dirname, 'dist'),
-      https: true,
-      index: '',
-      // index: 'gbuk/index.html',
-      // noInfo: true, // webpack bundle information
-      open: 'Google Chrome',
-      openPage: 'gbuk/index.html',
+      // headers: {
+      //   'Access-Control-Allow-Origin': '*'
+      // },
       proxy: {
         '/': {
           context: () => true,
-          target: 'https://www.currys.co.uk/',
-          secure: true,
+          target: `${protocol}//${host}`,
+          secure: protocol.indexOf('s') > 0,
           pathRewrite: { '^/': '' },
           // rewrite: function(req) {
           //   req.url = req.url.replace(/^\/gbuk/, '');
@@ -130,8 +147,8 @@ module.exports = function(env) {
             modifyResponse(res, proxyRes.headers['content-encoding'], (body) => {
               if (body) {
                 // modify some information
-                const modifiedBody = body.replace(new RegExp('www.currys.co.uk', 'g'), `localhost:${port}`);
-                const scriptedBody = modifiedBody.replace(new RegExp('<!-- /AdobeDTM_Header code -->', 'g'), `${bundleScript}<!-- /AdobeDTM_Header code --> `);
+                const modifiedBody = body.replace(new RegExp(host, 'g'), `localhost:${port}`);
+                const scriptedBody = modifiedBody.replace(new RegExp('<!-- /AdobeDTM_Header code -->', 'g'), `${bundleScript(filename)}<!-- /AdobeDTM_Header code --> `);
                 return scriptedBody;
               }
               return body;
@@ -139,10 +156,15 @@ module.exports = function(env) {
           }
         }
       },
-      publicPath: '/gbuk/'
+      publicPath: '/gbuk/',
+      stats: 'minimal'
     },
+    devtool: env.prod ? 'none' : 'eval',
+    mode: env.prod ? 'production' : 'development',
+    watch: true,
     plugins: [
-      new CleanWebpackPlugin(['dist']),
+      new CleanWebpackPlugin(['dist'])
+      // NOTE: Uncomment to use local template
       // new HtmlWebpackPlugin({
       //   template: path.join(__dirname, './src/index.html'),
       //   inject: 'body'
