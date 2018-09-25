@@ -124,7 +124,7 @@ module.exports = function(env) {
       https: true,
       index: '',
       open: 'Google Chrome',
-      openPage: parsedPath,
+      openPage: parsedPath.substring(1),
       overlay: {
         warnings: true,
         errors: true
