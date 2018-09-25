@@ -3,7 +3,7 @@ export const bundleScript = filename => `
       (function () {
         var script = document.createElement('script');
         script.type = 'text/javascript';
-        script.src = '${filename}';
+        script.src = '/${filename}';
         var s = document.getElementById('bundle-script');
         s.parentNode.insertBefore(script, s);
       })();
