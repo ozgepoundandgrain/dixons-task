@@ -32,6 +32,7 @@ module.exports = function(env) {
 
   const {
     url: experimentURL,
+    polyfill,
     port
   } = config;
 
@@ -41,11 +42,11 @@ module.exports = function(env) {
     protocol
   } = url.parse(experimentURL);
 
+  const entry = [path.join(__dirname, `./src/${experimentName}`)];
+  if (polyfill) entry.unshift(...polyfill);
+
   return {
-    entry: [
-      // 'babel-polyfill',
-      path.join(__dirname, `./src/${experimentName}`)
-    ],
+    entry: entry,
     cache: false,
     resolve: {
       extensions: ['.js', '.styl']
