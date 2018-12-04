@@ -148,8 +148,9 @@ module.exports = function(env) {
             modifyResponse(res, proxyRes.headers['content-encoding'], (body) => {
               if (body) {
                 // modify some information
+                const updateText = '</head>'; // modify where the script is inserted
                 const modifiedBody = body.replace(new RegExp(host, 'g'), `localhost:${port}`);
-                const scriptedBody = modifiedBody.replace(new RegExp('<!-- /AdobeDTM_Header code -->', 'g'), `${bundleScript(filename)}<!-- /AdobeDTM_Header code --> `);
+                const scriptedBody = modifiedBody.replace(new RegExp(updateText, 'g'), `${bundleScript(filename)}${updateText} `);
                 return scriptedBody;
               }
               return body;
