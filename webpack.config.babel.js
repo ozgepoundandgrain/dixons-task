@@ -145,16 +145,19 @@ module.exports = function(env) {
           // },
           changeOrigin: true,
           onProxyRes: (proxyRes, req, res) => {
-            modifyResponse(res, proxyRes.headers['content-encoding'], (body) => {
-              if (body) {
-                // modify some information
-                const updateText = '</head>'; // modify where the script is inserted
-                const modifiedBody = body.replace(new RegExp(host, 'g'), `localhost:${port}`);
-                const scriptedBody = modifiedBody.replace(new RegExp(updateText, 'g'), `${bundleScript(filename)}${updateText} `);
-                return scriptedBody;
-              }
-              return body;
-            });
+            // req.get('accept'));
+            if (/text\/html/.test(req.get('accept'))) {
+              modifyResponse(res, proxyRes.headers['content-encoding'], (body) => {
+                if (body) {
+                  // modify some information
+                  const updateText = '</head>'; // modify where the script is inserted
+                  const modifiedBody = body.replace(new RegExp(host, 'g'), `localhost:${port}`);
+                  const scriptedBody = modifiedBody.replace(new RegExp(updateText, 'g'), `${bundleScript(filename)}${updateText} `);
+                  return scriptedBody;
+                }
+                return body;
+              });
+            }
           }
         }
       },
