@@ -1,5 +1,5 @@
 /* eslint-disable func-names, import/no-dynamic-require */
-import CleanWebpackPlugin from 'clean-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import modifyResponse from 'http-proxy-response-rewrite';
 import path from 'path';
@@ -171,7 +171,7 @@ module.exports = function(env) {
     mode: env.prod ? 'production' : 'development',
     watch: true,
     plugins: [
-      new CleanWebpackPlugin(['dist'])
+      new CleanWebpackPlugin()
       // NOTE: Uncomment to use local template
       // new HtmlWebpackPlugin({
       //   template: path.join(__dirname, './src/index.html'),
