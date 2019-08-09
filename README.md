@@ -56,6 +56,9 @@ npm run build [PROJECT DIRECTORY]
 
 [Semantic Versioning 2.0.0](https://semver.org/)
 
+## Changelog
+Please see [changelog](https://bitbucket.org/teamoptimise/experiments/src/develop/CHANGELOG.md)
+
 ## Authors
 
 * **Tayeb Melksari** - *Initial work*

@@ -1,6 +1,9 @@
 /* eslint-disable func-names, import/no-dynamic-require */
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import HtmlWebpackInlineSourcePlugin from 'html-webpack-inline-source-plugin';
+import RenameWebpackPlugin from 'rename-webpack-plugin';
+
 import modifyResponse from 'http-proxy-response-rewrite';
 import path from 'path';
 import url from 'url';
@@ -171,12 +174,16 @@ module.exports = function(env) {
     mode: env.prod ? 'production' : 'development',
     watch: true,
     plugins: [
-      new CleanWebpackPlugin()
-      // NOTE: Uncomment to use local template
-      // new HtmlWebpackPlugin({
-      //   template: path.join(__dirname, './src/index.html'),
-      //   inject: 'body'
-      // })
+      new CleanWebpackPlugin(),
+      new HtmlWebpackPlugin({
+        template: path.join(__dirname, './dev/template.html'),
+        inlineSource: '.(js)$'
+      }),
+      new HtmlWebpackInlineSourcePlugin(),
+      new RenameWebpackPlugin({
+        originNameReg: 'index.html',
+        targetName: `${filename}.txt`
+      })
     ]
   };
 };
