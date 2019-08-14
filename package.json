@@ -22,7 +22,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/account/user/teamoptimise/projects/FOS",
   "devDependencies": {
-    "@dc/eslint-config": "^4.0.0",
+    "@dc/eslint-config": "file:./local_node_modules/@dc/eslint-config",
     "autoprefixer": "^9.6.1",
     "babel-core": "^6.26.3",
     "babel-eslint": "^9.0.0",
