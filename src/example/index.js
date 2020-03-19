@@ -1,12 +1,8 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import whenDomReady from 'when-dom-ready';
+import init from './init';
 
-const App = () => {
-  return (
-    <div>
-      <p>React here!</p>
-    </div>
-  );
-};
-export default App;
-ReactDOM.render(<App />, document.getElementById('content'));
+(() => {
+  whenDomReady().then(() => {
+    init();
+  });
+})();
