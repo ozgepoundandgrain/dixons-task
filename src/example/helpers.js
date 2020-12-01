@@ -106,3 +106,38 @@ export const fetchProductRatings = (sku) => {
       });
   };
 
+
+export const getListingPageBasedOnFilters = (base64JSON) => {
+  fetch(`https://www.currys.co.uk/api/shopping/product-listing/page/json/${btoa(JSON.stringify(base64JSON))}`, {
+    method: 'GET',
+    mode: 'no-cors'
+  }).then(res => res.text()).then((data) => {
+    window.location.href = `http://www.currys.co.uk${JSON.parse(data).pagination.pageList[0].url}`;
+  });
+}
+// EXAMPLE base64JSON for listing page filtering functionality:
+// You can find the base64 string in the api request url in networks tab and convert it to the JSON object using an online tool, in
+// order to get a live example of the below object.
+// const appState = window.appState.getState('listingPage').listingPage;
+// const attributesObject = {};
+// const sortDirection = (appState.pageSetup.sortByOptions.selectedOptionValue.includes('asc') && 'ascending') || (this.appState.pageSetup.sortByOptions.selectedOptionValue.includes('desc') && 'descending') || 'none'
+// const base64 = {
+//   'sortDirection': sortDirection,
+//   'sortField': (
+//     (appState.pageSetup.sortByOptions.selectedOptionValue.includes('price') && 'price') ||
+//     (appState.pageSetup.sortByOptions.selectedOptionValue.includes('brand') && 'brand') ||
+//     (appState.pageSetup.sortByOptions.selectedOptionValue.includes('rating') && 'rating') ||
+//     (appState.pageSetup.sortByOptions.selectedOptionValue.includes('discount') && 'discount') ||
+//     'none'
+//   ),
+//   'productCount': appState.pagination.itemsNumberPerPage.selectedOptionValue,
+//   'pageNumber': 1,
+//   'marketId': appState.pageSetup.category.marketId,
+//   'segmentId': appState.pageSetup.category.segmentId,
+//   'categoryId': appState.pageSetup.category.categoryId,
+//   'brandIds': appState.filters.list.filter(item => item.name === 'brand_id')[0].options.filter(item => item.active).map(item => parseInt(item.value, 10)),
+//   'priceMin': appState.filters.list[0].options.filter(item => item.active).length > 0 ? appState.filters.list[0].limitBetween.left.value : null,
+//   'priceMax': appState.filters.list[0].options.filter(item => item.active).length > 0 ? appState.filters.list[0].limitBetween.right.value : null,
+//   'attributes': attributesObject,
+//   'view': appState.pageSetup.viewSwitch
+// }
